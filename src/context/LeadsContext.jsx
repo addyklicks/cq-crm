@@ -3,6 +3,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initialLeads } from '../data/mockData';
 
 const LeadsContext = createContext();
+const LEADS_STORAGE_KEY = 'crm_leads_v2';
+const legacyStatusMap = {
+  Contacted: '1st Followup',
+  Qualified: '2nd Followup',
+};
 
 export const useLeads = () => {
   const context = useContext(LeadsContext);
@@ -14,8 +19,13 @@ export const useLeads = () => {
 
 export const LeadsProvider = ({ children }) => {
   const [leads, setLeads] = useState(() => {
-    const saved = localStorage.getItem('crm_leads');
-    return saved ? JSON.parse(saved) : initialLeads;
+    const saved = localStorage.getItem(LEADS_STORAGE_KEY);
+    const parsedLeads = saved ? JSON.parse(saved) : initialLeads;
+
+    return parsedLeads.map((lead) => ({
+      ...lead,
+      status: legacyStatusMap[lead.status] ?? lead.status,
+    }));
   });
 
   const [modalState, setModalState] = useState({
@@ -24,7 +34,7 @@ export const LeadsProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('crm_leads', JSON.stringify(leads));
+    localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
   }, [leads]);
 
   const openModal = (lead = null) => {

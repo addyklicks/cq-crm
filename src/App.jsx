@@ -10,7 +10,8 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<KanbanBoard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="board" element={<KanbanBoard />} />
           <Route path="list" element={<LeadsList />} />
         </Route>
